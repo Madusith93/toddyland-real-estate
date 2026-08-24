@@ -8,7 +8,9 @@ import ServicesSection from "./components/ServicesSection";
 import MostRecommendedProperties from "./components/MostRecommendedProperties";
 import PropertyTypes from "./components/PropertyTypes";
 import SriLankaOverview from "./components/SriLankaOverview";
-
+import ForeignBuyerGuide from "./components/ForeignBuyerGuide";
+import PortCitySection from "./components/PortCitySection";
+import LatestPropertiesSection from "./components/Latestproperties";
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
@@ -26,6 +28,9 @@ export default function Home() {
         <MostRecommendedProperties />
         <PropertyTypes />
         <SriLankaOverview />
+        <ForeignBuyerGuide />
+        <PortCitySection />
+        <LatestPropertiesSection />
       </div>
     </main>
   );
