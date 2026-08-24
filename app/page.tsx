@@ -5,6 +5,9 @@ import AllPropertiesMap from "./components/AllPropertiesMap";
 import WelcomeSection from "./components/WelcomeSection";
 import FindPropertiesByLocation from "./components/FindPropertiesByLocation";
 import ServicesSection from "./components/ServicesSection";
+import MostRecommendedProperties from "./components/MostRecommendedProperties";
+import PropertyTypes from "./components/PropertyTypes";
+import SriLankaOverview from "./components/SriLankaOverview";
 
 export default function Home() {
   return (
@@ -20,6 +23,9 @@ export default function Home() {
         <WelcomeSection />
         <FindPropertiesByLocation />
         <ServicesSection />
+        <MostRecommendedProperties />
+        <PropertyTypes />
+        <SriLankaOverview />
       </div>
     </main>
   );
