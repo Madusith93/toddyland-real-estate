@@ -8,5 +8,9 @@ export const MAP_CONFIG = {
   center: { lat: 7.8731, lng: 80.7718 },
   zoom: 8,
   libraries: ['drawing', 'places', 'geometry'],
-  apiKey
+  apiKey,
+  mapId:
+    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID) ||
+    (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_MAPS_MAP_ID) ||
+    ''
 }
