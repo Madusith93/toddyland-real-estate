@@ -3,7 +3,7 @@ import Script from "next/script";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import TranslateOffsetFix from "@/components/TranslateOffsetFix";
-// import Footer from "@/components/Footer"; 
+import Footer from "@/components/Footer"; 
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./globals.css";
@@ -33,11 +33,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         />
-      </head>
 
-      <body
-        className={`${jakartaSans.variable} font-sans antialiased bg-white text-slate-900 flex flex-col min-h-screen`}
-      >
         {/* Google Analytics Scripts */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-22KG6FP2P0"
@@ -56,10 +52,10 @@ export default function RootLayout({
           }}
         />
 
-        {/* Google Translate Init Script */}
+        {/* Google Translate Init Script Strategy fixed to beforeInteractive */}
         <Script
           id="google-translate-custom-init"
-          strategy="lazyOnload"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               function googleTranslateElementInit() {
@@ -75,6 +71,13 @@ export default function RootLayout({
             `,
           }}
         />
+      </head>
+
+      <body
+        className={`${jakartaSans.variable} font-sans antialiased bg-white text-slate-900 flex flex-col min-h-screen`}
+      >
+        {/* Hidden Google Translate Mount Container placed before external script */}
+        <div id="google_translate_element" style={{ display: "none" }}></div>
 
         {/* Google Translate External Library */}
         <Script
@@ -91,13 +94,10 @@ export default function RootLayout({
         </main>
 
         {/* Global Footer Bar */}
-        {/* <Footer /> */}
+        <Footer /> 
 
         {/* Translation Layout Fix Component */}
         <TranslateOffsetFix />
-
-        {/* Hidden Google Translate Mount Container */}
-        <div id="google_translate_element" style={{ display: "none" }}></div>
       </body>
     </html>
   );

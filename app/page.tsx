@@ -11,6 +11,10 @@ import SriLankaOverview from "./components/SriLankaOverview";
 import ForeignBuyerGuide from "./components/ForeignBuyerGuide";
 import PortCitySection from "./components/PortCitySection";
 import LatestPropertiesSection from "./components/Latestproperties";
+import SriLankaLeadsSection from "./components/SriLankaLeads";
+import WhyToodylandRealEsate from "./components/WhyToddylandRealEstate";
+import TeamSection from "./components/TeamSection";
+import WondersOfSriLanka from "./components/WondersOfSriLanka";
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
@@ -31,6 +35,11 @@ export default function Home() {
         <ForeignBuyerGuide />
         <PortCitySection />
         <LatestPropertiesSection />
+        <SriLankaLeadsSection />
+        <WhyToodylandRealEsate />
+        <TeamSection />
+        <WondersOfSriLanka />
+        
       </div>
     </main>
   );

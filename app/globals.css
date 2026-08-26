@@ -18,3 +18,24 @@
   font-weight: 800;
   letter-spacing: -0.025em;
 }
+
+/* Hide Google Translate Top Banner and Prevent Layout Shift */
+.goog-te-banner-frame,
+iframe.goog-te-banner-frame,
+.skiptranslate > iframe,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+/* Hide Google Highlight tooltips on text hover */
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}

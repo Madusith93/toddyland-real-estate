@@ -9,13 +9,13 @@ interface PreferencesModalProps {
 
 export default function PreferencesModal({ isOpen, onClose }: PreferencesModalProps) {
   const [language, setLanguage] = useState<string>('EN');
-  const [currency, setCurrency] = useState<string>('USD');
+  const [currency, setCurrency] = useState<string>('LKR');
   const [unit, setUnit] = useState<string>('M2');
 
   useEffect(() => {
     if (typeof window !== 'undefined' && isOpen) {
       setLanguage(localStorage.getItem('global_language') || 'EN');
-      setCurrency(localStorage.getItem('global_currency') || 'USD');
+      setCurrency(localStorage.getItem('global_currency') || 'LKR');
       setUnit(localStorage.getItem('global_unit') || 'M2');
     }
   }, [isOpen]);
@@ -32,9 +32,11 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
       const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
       const domain = hostname.includes('.') ? `.${hostname.split('.').slice(-2).join('.')}` : hostname;
 
-      // Clear existing translation cookies
+      // 1. Clear existing cookies
       document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+      if (!isLocalhost) {
+        document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+      }
 
       let cookieValue = '';
       let googleLangCode = 'en';
@@ -47,7 +49,7 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
         googleLangCode = 'si';
       }
 
-      // Set new translation cookie
+      // 2. Set new translation cookie
       if (cookieValue) {
         document.cookie = `googtrans=${cookieValue}; path=/;`;
         if (!isLocalhost) {
@@ -55,7 +57,7 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
         }
       }
 
-      // Trigger Google Translate Dropdown
+      // 3. Trigger Google Translate Dropdown if present
       const googleSelect = document.querySelector('.goog-te-combo') as HTMLSelectElement;
       if (googleSelect) {
         googleSelect.value = googleLangCode;
@@ -69,17 +71,19 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
 
     onClose();
 
+    // Refresh page to apply translation smoothly
     setTimeout(() => {
       window.location.reload();
-    }, 300);
+    }, 200);
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[99999]">
-      <div className="bg-white rounded-2xl p-6 w-[480px] relative shadow-xl text-slate-900 transition-all">
+      {/* notranslate class prevents Google from translating the Modal UI */}
+      <div className="bg-white rounded-2xl p-6 w-[480px] relative shadow-xl text-slate-900 transition-all notranslate">
         <button 
           onClick={onClose} 
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-semibold"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-semibold text-lg"
         >
           ✕
         </button>
@@ -102,7 +106,7 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
                 type="button"
                 onClick={() => setLanguage(item.id)}
                 className={`py-2 rounded-lg text-sm font-medium border transition-all ${
-                  language === item.id ? 'bg-slate-900 text-white' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                  language === item.id ? 'bg-slate-900 text-white border-slate-900' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                 }`}
               >
                 {item.name}
@@ -124,7 +128,7 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
                 type="button"
                 onClick={() => setUnit(item.id)}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-all ${
-                  unit === item.id ? 'bg-slate-900 text-white' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                  unit === item.id ? 'bg-slate-900 text-white border-slate-900' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                 }`}
               >
                 {item.name}
@@ -136,8 +140,9 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
         {/* CURRENCY */}
         <div className="mb-6">
           <label className="text-xs font-semibold text-gray-400 block mb-2">CURRENCY</label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {[
+              { id: 'LKR', name: 'LKR (Rs.)' },
               { id: 'USD', name: 'USD ($)' },
               { id: 'JPY', name: 'JPY (¥)' },
               { id: 'EUR', name: 'EUR (€)' },
@@ -150,7 +155,7 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
                 type="button"
                 onClick={() => setCurrency(item.id)}
                 className={`py-2 rounded-lg text-sm font-medium border transition-all ${
-                  currency === item.id ? 'bg-slate-900 text-white' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                  currency === item.id ? 'bg-slate-900 text-white border-slate-900' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                 }`}
               >
                 {item.name}

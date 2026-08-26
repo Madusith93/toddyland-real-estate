@@ -5,14 +5,13 @@ import Image from 'next/image';
 
 type TabType = 'BUY' | 'RENT' | 'LAND';
 
-// Sample Property Data (3 items per category in LKR)
 const propertiesData = [
   // BUY Category (3 Cards)
   {
     id: 1,
     category: 'BUY',
     type: 'Apartment',
-    price: '105,000,000 LKR (345,000 USD)',
+    price: '105,000,000 LKR ',
     location: 'Galle - Southern province',
     layout: '4B / 136m2',
     image: '/apartment.jpg',
@@ -21,7 +20,7 @@ const propertiesData = [
     id: 2,
     category: 'BUY',
     type: 'Villa',
-    price: '137,000,000 LKR (450,000 USD)',
+    price: '137,000,000 LKR ',
     location: 'Colombo - Western province',
     layout: '4LDK / 180m2',
     image: '/villa.webp',
@@ -30,7 +29,7 @@ const propertiesData = [
     id: 3,
     category: 'BUY',
     type: 'Luxury Condominium',
-    price: '85,000,000 LKR (280,000 USD)',
+    price: '85,000,000 LKR ',
     location: 'Mount Lavinia - Western province',
     layout: '3B / 125m2',
     image: '/lux.jpg',
@@ -41,28 +40,28 @@ const propertiesData = [
     id: 4,
     category: 'RENT',
     type: 'Apartment',
-    price: '750,000 LKR / mo',
+    price: '750,000 LKR / ',
     location: 'Colombo 03 - Western province',
     layout: '3B / 120m2',
-    image: '/images/property-4.jpg',
+    image: '/rent apa.jpg',
   },
   {
     id: 5,
     category: 'RENT',
     type: 'Beach Villa',
-    price: '1,200,000 LKR / mo',
+    price: '1,200,000 LKR / ',
     location: 'Bentota - Southern province',
     layout: '4B / 200m2',
-    image: '/images/property-5.jpg',
+    image: '/beach villa.jpeg',
   },
   {
     id: 6,
     category: 'RENT',
     type: 'Penthouse',
-    price: '950,000 LKR / mo',
+    price: '950,000 LKR / ',
     location: 'Colombo 07 - Western province',
     layout: '3LDK / 160m2',
-    image: '/images/property-6.jpg',
+    image: '/penthouse.jpg',
   },
 
   // LAND Category (3 Cards)
@@ -73,7 +72,7 @@ const propertiesData = [
     price: '60,000,000 LKR',
     location: 'Mirissa - Southern province',
     layout: '20 Perches',
-    image: '/images/property-7.jpg',
+    image: '/beachfrontland.jpg',
   },
   {
     id: 8,
@@ -82,7 +81,7 @@ const propertiesData = [
     price: '120,000,000 LKR',
     location: 'Rajagiriya - Western province',
     layout: '15 Perches',
-    image: '/images/property-8.jpg',
+    image: '/commericalland.jpg',
   },
   {
     id: 9,
@@ -91,29 +90,28 @@ const propertiesData = [
     price: '35,000,000 LKR',
     location: 'Kandy - Central province',
     layout: '12.5 Perches',
-    image: '/images/property-9.jpg',
+    image: '/Residential.jpg',
   },
 ];
 
 export default function LatestPropertiesSection() {
   const [activeTab, setActiveTab] = useState<TabType>('BUY');
 
-  // Filter properties based on selected tab (Always gets 3 cards)
   const filteredProperties = propertiesData.filter(
     (item) => item.category === activeTab
   );
 
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header Section (Centered Title & Pill-Style Nav Bar) */}
+        {/* Header Section */}
         <div className="text-center mb-10 space-y-4">
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Latest <span className="text-red-600">Properties</span>
           </h2>
 
-          {/* Pill Style Filter Buttons */}
+          {/* Nav Bar */}
           <div className="inline-flex p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm">
             {(['BUY', 'RENT', 'LAND'] as TabType[]).map((tab) => (
               <button
@@ -131,39 +129,39 @@ export default function LatestPropertiesSection() {
           </div>
         </div>
 
-        {/* Property Cards Grid (3 Cards Layout) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* Property Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProperties.map((property) => (
             <div
               key={property.id}
-              className="bg-white rounded-xl overflow-hidden group border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white rounded-2xl overflow-hidden group border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
-              {/* Property Image Container */}
-              <div className="relative w-full h-[240px] bg-slate-200 overflow-hidden">
+              {/* Image Container matched to Most Recommended Properties (h-56 standard) */}
+              <div className="relative h-56 w-full overflow-hidden bg-slate-100">
                 <Image
                   src={property.image}
                   alt={property.type}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
               {/* Property Details */}
-              <div className="p-4 space-y-1.5 text-xs sm:text-sm text-slate-700 font-medium">
+              <div className="p-5 space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
                 <p>
-                  <span className="text-slate-900 font-semibold">TYPE - </span>
+                  <span className="text-slate-900 font-bold">TYPE - </span>
                   {property.type}
                 </p>
                 <p>
-                  <span className="text-slate-900 font-semibold">Price - </span>
-                  {property.price}
+                  <span className="text-slate-900 font-bold">Price - </span>
+                  <span className="text-red-600 font-bold">{property.price}</span>
                 </p>
                 <p>
-                  <span className="text-slate-900 font-semibold">Location - </span>
+                  <span className="text-slate-900 font-bold">Location - </span>
                   {property.location}
                 </p>
                 <p>
-                  <span className="text-slate-900 font-semibold">Layout - </span>
+                  <span className="text-slate-900 font-bold">Layout - </span>
                   {property.layout}
                 </p>
               </div>
