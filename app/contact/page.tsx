@@ -15,7 +15,7 @@ export default function AboutContactPage() {
           <div className="w-16 h-1 bg-red-600 mx-auto rounded-full mb-2"></div>
           <p className="text-xs font-bold tracking-widest text-red-600 uppercase">Contact & Info</p>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
-            About & Contact Us
+            About – <span className="text-red-600">& Contact Us</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-600 font-medium">
             Toddyland Real Estate — Connecting Global Buyers to Sri Lanka

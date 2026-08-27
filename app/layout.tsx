@@ -52,10 +52,10 @@ export default function RootLayout({
           }}
         />
 
-        {/* Google Translate Init Script Strategy fixed to beforeInteractive */}
+        {/* Google Translate Init Script - Changed strategy to afterInteractive */}
         <Script
           id="google-translate-custom-init"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               function googleTranslateElementInit() {
