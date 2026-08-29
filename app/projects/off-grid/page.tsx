@@ -29,16 +29,14 @@ export default function OffGridLivingPage() {
   return (
     <main className="min-h-screen bg-white text-slate-800 py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-4xl mx-auto space-y-16">
-        
-        {/* HEADER SECTION - Port City Style with Red Accent Border & Larger Typography */}
-       {/* HEADER SECTION - Centered with Red Accent Border & Larger Typography */}
+    {/* HEADER SECTION - Centered with Red Accent Typography */}
 <div className="flex flex-col items-center text-center space-y-3 py-4">
-  <div className="border-l-4 border-red-600 pl-4 inline-block text-left sm:text-center sm:border-l-0 sm:border-b-4 sm:pb-2 sm:pl-0">
+  <div className="inline-block text-left sm:text-center">
     <p className="text-sm font-semibold tracking-widest text-red-600 uppercase">
-      Project - Off Grid Living
+      
     </p>
   </div>
-  
+
   <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
     Off-Grid <span className="text-red-600">Living In Sri Lanka</span>
   </h1>

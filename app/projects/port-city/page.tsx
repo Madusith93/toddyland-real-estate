@@ -23,12 +23,11 @@ export default function PortCityProjectPage() {
   const emailAddress = "info@toddylandrealestate.com";
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 notranslate py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-12">
         
         {/* PAGE HEADER */}
         <div className="text-center space-y-3">
-          <p className="text-xs font-bold tracking-widest text-red-600 uppercase">Projects & Investments</p>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
             Port City Colombo-<span className="text-red-600">Project Overview</span>
           </h1>
@@ -352,7 +351,6 @@ export default function PortCityProjectPage() {
         </section>
 
         {/* SECTION 7: TRENDS OF ROI GRAPH */}
-     {/* SECTION 7: TRENDS OF ROI GRAPH */}
         <section className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-slate-200/80 space-y-4">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <span className="w-2 h-6 bg-red-600 rounded-full inline-block"></span>
@@ -368,7 +366,6 @@ export default function PortCityProjectPage() {
               alt="Trends of ROI Graph" 
               className="w-full h-full object-contain bg-white p-2"
               onError={(e) => {
-            
                 e.currentTarget.src = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80";
               }}
             />

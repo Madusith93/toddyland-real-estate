@@ -3,12 +3,12 @@ import Script from "next/script";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import TranslateOffsetFix from "@/components/TranslateOffsetFix";
+import RouteTranslateHandler from "@/components/RouteTranslateHandler"; 
 import Footer from "@/components/Footer"; 
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./globals.css";
 
-// Google Font Configuration (Plus Jakarta Sans)
 const jakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
@@ -28,13 +28,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* FontAwesome CDN Link */}
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         />
 
-        {/* Google Analytics Scripts */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-22KG6FP2P0"
           strategy="afterInteractive"
@@ -52,17 +50,16 @@ export default function RootLayout({
           }}
         />
 
-        {/* Google Translate Init Script - Changed strategy to afterInteractive */}
         <Script
           id="google-translate-custom-init"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               function googleTranslateElementInit() {
                 if (window.google && window.google.translate) {
                   new window.google.translate.TranslateElement({
                     pageLanguage: 'en',
-                    includedLanguages: 'en,ja,zh-CN,zh-TW,si',
+                    includedLanguages: 'en,ja,si',
                     layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
                     autoDisplay: false
                   }, 'google_translate_element');
@@ -76,27 +73,23 @@ export default function RootLayout({
       <body
         className={`${jakartaSans.variable} font-sans antialiased bg-white text-slate-900 flex flex-col min-h-screen`}
       >
-        {/* Hidden Google Translate Mount Container placed before external script */}
         <div id="google_translate_element" style={{ display: "none" }}></div>
 
-        {/* Google Translate External Library */}
         <Script
           src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
           strategy="afterInteractive"
         />
 
-        {/* Global Navigation Bar */}
+        <RouteTranslateHandler /> 
+
         <Navbar />
 
-        {/* Main Page Content */}
         <main className="flex-grow pt-16">
           {children}
         </main>
 
-        {/* Global Footer Bar */}
         <Footer /> 
 
-        {/* Translation Layout Fix Component */}
         <TranslateOffsetFix />
       </body>
     </html>

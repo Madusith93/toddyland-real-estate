@@ -4,13 +4,12 @@ import React from 'react';
 
 export default function ServicesPage() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 notranslate py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-16">
         
         {/* PAGE HEADER */}
         <div className="text-center space-y-3">
-          <div className="w-16 h-1 bg-red-600 mx-auto rounded-full mb-2"></div>
-          <p className="text-xs font-bold tracking-widest text-red-600 uppercase">Services</p>
+         
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
             Our Services – <span className="text-red-600">Toddyland Real Estate</span>
           </h1>

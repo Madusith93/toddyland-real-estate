@@ -29,15 +29,6 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
 
     if (typeof document !== 'undefined') {
       const hostname = window.location.hostname;
-      const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
-      const domain = hostname.includes('.') ? `.${hostname.split('.').slice(-2).join('.')}` : hostname;
-
-      // 1. Clear existing cookies
-      document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      if (!isLocalhost) {
-        document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
-      }
-
       let cookieValue = '';
       let googleLangCode = 'en';
 
@@ -49,19 +40,22 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
         googleLangCode = 'si';
       }
 
-      // 2. Set new translation cookie
+      // 1. Clear existing cookies (All paths and hostnames)
+      document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      document.cookie = `googtrans=; path=/; domain=${hostname}; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+      document.cookie = `googtrans=; path=/; domain=.${hostname}; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+
+      // 2. Set new translation cookie globally across all sub-pages
       if (cookieValue) {
         document.cookie = `googtrans=${cookieValue}; path=/;`;
-        if (!isLocalhost) {
-          document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain};`;
-        }
+        document.cookie = `googtrans=${cookieValue}; path=/; domain=${hostname};`;
       }
 
-      // 3. Trigger Google Translate Dropdown if present
+      // 3. Trigger Google Translate Combo
       const googleSelect = document.querySelector('.goog-te-combo') as HTMLSelectElement;
       if (googleSelect) {
         googleSelect.value = googleLangCode;
-        googleSelect.dispatchEvent(new Event('change'));
+        googleSelect.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
 
@@ -71,15 +65,14 @@ export default function PreferencesModal({ isOpen, onClose }: PreferencesModalPr
 
     onClose();
 
-    // Refresh page to apply translation smoothly
+    // Smooth Reload to bind translation globally on subroutes
     setTimeout(() => {
       window.location.reload();
-    }, 200);
+    }, 100);
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[99999]">
-      {/* notranslate class prevents Google from translating the Modal UI */}
       <div className="bg-white rounded-2xl p-6 w-[480px] relative shadow-xl text-slate-900 transition-all notranslate">
         <button 
           onClick={onClose} 
