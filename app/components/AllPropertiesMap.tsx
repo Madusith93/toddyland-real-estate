@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 // These are the actual modules from the src/ folder you dropped into the
 // project root — this component just wires them up inside React's
@@ -11,6 +12,7 @@ import { initBoundsManager } from '../../src/core/boundsManager.js';
 import { addMarker, getMarkers, clearMarkers } from '../../src/markers/markerManager.js';
 import { createInfoWindow, closeInfoWindow } from '../../src/markers/infoWindow.js';
 import { initMarkerCluster, clearCluster } from '../../src/markers/markerCluster.js';
+import { initRegionTool, removeRegionTool } from '../../src/drawing/drawAreaTool.js';
 import { sampleProperties } from '../../src/data/sampleProperties.js';
 
 const MAP_ELEMENT_ID = 'all-properties-map';
@@ -19,6 +21,13 @@ export default function AllPropertiesMap() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState('');
+  // The district a user has clicked on the draw-area overlay, while they're
+  // deciding whether to jump to the full properties page. Cleared again if
+  // they click the same district a second time (initRegionTool's own
+  // toggle-off behavior calls back with `null`). `province`/`provinceKey`
+  // ride along from drawAreaTool.js purely for display context.
+  const [selectedDistrict, setSelectedDistrict] = useState<{ key: string; name: string; province: string; provinceKey: string } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     let cancelled = false;
@@ -32,6 +41,14 @@ export default function AllPropertiesMap() {
           console.log('Fetch properties for:', bounds);
         }, MAP_ELEMENT_ID);
 
+        // Same route/param convention as the properties page's own
+        // useSearchParams() handling (searchParams.get('id') ||
+        // searchParams.get('select')) — clicking a marker here selects and
+        // scrolls to that listing on /properties.
+        const goToProperty = (property: any) => {
+          router.push(`/properties?id=${property.id}`);
+        };
+
         sampleProperties.forEach((property: any) => {
           const marker = addMarker({
             lat: property.lat,
@@ -41,10 +58,40 @@ export default function AllPropertiesMap() {
             data: property,
             mapId: MAP_ELEMENT_ID,
           });
-          createInfoWindow(marker, property);
+
+          if (marker) {
+            try {
+              // AdvancedMarkerElement (used for the price-pill markers built
+              // by createPriceMarkerElement) exposes its DOM node as
+              // `.content` — attach the click handler there directly since
+              // it doesn't reliably fire through google.maps.event.
+              if (marker.content && typeof marker.content.addEventListener === 'function') {
+                marker.content.style.cursor = 'pointer';
+                marker.content.addEventListener('click', () => goToProperty(property));
+              } else if (typeof window !== 'undefined' && (window as any).google?.maps?.event) {
+                // Classic google.maps.Marker fallback.
+                (window as any).google.maps.event.addListener(marker, 'click', () => goToProperty(property));
+              }
+            } catch (err) {
+              console.log('Could not attach marker click handler:', err);
+            }
+
+            createInfoWindow(marker, property);
+          }
         });
 
         initMarkerCluster(getMarkers(), MAP_ELEMENT_ID);
+
+        // Same draw-area overlay as the properties page — now filtering by
+        // district rather than province, since each of the 25 shapes in the
+        // geojson is one district already. Clicking one highlights it and
+        // shows a "Browse <District>" prompt below the map (see the
+        // ready-state overlay) rather than navigating immediately, since a
+        // misclick shouldn't yank someone off the landing page. The "View
+        // All" badge always stays available regardless of selection.
+        initRegionTool((region: { key: string; name: string; province: string; provinceKey: string } | null) => {
+          setSelectedDistrict(region);
+        }, MAP_ELEMENT_ID);
 
         setStatus('ready');
       } catch (err: any) {
@@ -60,9 +107,10 @@ export default function AllPropertiesMap() {
       closeInfoWindow();
       clearCluster();
       clearMarkers();
+      removeRegionTool(MAP_ELEMENT_ID);
       destroyMap(MAP_ELEMENT_ID);
     };
-  }, []);
+  }, [router]);
 
   return (
     <section className="py-16 bg-white border-b border-gray-100">
@@ -109,10 +157,37 @@ export default function AllPropertiesMap() {
             </div>
           )}
 
-          {status === 'ready' && (
-            <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 shadow-md pointer-events-none">
-              📍 {sampleProperties.length} Properties
-            </div>
+          {status === 'ready' && !selectedDistrict && (
+            <>
+              <button
+                type="button"
+                onClick={() => router.push('/properties')}
+                className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 shadow-md hover:bg-white transition-colors cursor-pointer"
+              >
+                📍 {sampleProperties.length} Properties — View All
+              </button>
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-200 text-[11px] font-semibold text-slate-500 shadow-sm pointer-events-none">
+                Click a district to browse
+              </div>
+            </>
+          )}
+
+          {/* Clicking a district highlights it (via initRegionTool's own
+              styling) and surfaces this prompt instead of navigating
+              immediately — same click-to-select-then-confirm pattern as the
+              properties page's own draw tool. Navigates with ?district=
+              (properties/page.tsx already reads searchParams.get('district')),
+              not ?province=. */}
+          {status === 'ready' && selectedDistrict && (
+            <button
+              type="button"
+              onClick={() => router.push(`/properties?district=${selectedDistrict.key}`)}
+              className="absolute bottom-4 left-4 bg-red-600 text-white px-4 py-2 rounded-xl shadow-md hover:bg-red-700 transition-colors cursor-pointer text-xs font-bold flex items-center gap-2"
+            >
+              <i className="fa-solid fa-location-dot" />
+              Browse {selectedDistrict.name} Properties
+              <i className="fa-solid fa-arrow-right" />
+            </button>
           )}
         </div>
       </div>

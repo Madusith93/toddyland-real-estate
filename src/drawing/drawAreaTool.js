@@ -1,54 +1,79 @@
 import { getMap } from '../core/mapInstance.js'
 
-let activeRegionKey = null
-let onRegionSelectedCallback = null
+// Keyed by mapId (mirroring mapInstance.js's own mapInstances pattern) so
+// this tool can be attached to more than one map on the site — e.g. the
+// properties page's map (default id "map") AND the landing page's
+// AllPropertiesMap (id "all-properties-map") — without one page's clicks,
+// active-selection state, or teardown stepping on the other's.
+const toolState = {}
 
-// Sri Lanka's 9 provinces. ISO 3166-2:LK codes are used as the join key
-// (LK-1 .. LK-9) since most public Sri Lanka GeoJSON sources carry that
-// code under one of a few common property names (see
-// getRegionKeyFromFeature below).
-const SRI_LANKA_PROVINCES = {
-  western:        { name: 'Western',        color: '#eb3232', codes: ['1', 'LK-1', 'Western'] },
-  central:        { name: 'Central',        color: '#eb3232', codes: ['2', 'LK-2', 'Central'] },
-  southern:       { name: 'Southern',       color: '#eb3232', codes: ['3', 'LK-3', 'Southern'] },
-  northern:       { name: 'Northern',       color: '#eb3232', codes: ['4', 'LK-4', 'Northern'] },
-  eastern:        { name: 'Eastern',        color: '#eb3232', codes: ['5', 'LK-5', 'Eastern'] },
-  north_western:  { name: 'North Western',  color: '#eb3232', codes: ['6', 'LK-6', 'North Western'] },
-  north_central:  { name: 'North Central',  color: '#eb3232', codes: ['7', 'LK-7', 'North Central'] },
-  uva:            { name: 'Uva',            color: '#eb3232', codes: ['8', 'LK-8', 'Uva'] },
-  sabaragamuwa:   { name: 'Sabaragamuwa',   color: '#eb3232', codes: ['9', 'LK-9', 'Sabaragamuwa'] },
+function getState(mapId) {
+  if (!toolState[mapId]) {
+    toolState[mapId] = { activeRegionKey: null, onRegionSelectedCallback: null }
+  }
+  return toolState[mapId]
 }
 
-const codeToRegion = {}
-Object.entries(SRI_LANKA_PROVINCES).forEach(([regionKey, region]) => {
-  region.codes.forEach((code) => {
-    codeToRegion[String(code).toLowerCase()] = regionKey
-  })
-})
+const initializedMapIds = new Set()
+const SRI_LANKA_DISTRICTS = {
+  ampara:        { name: 'Ampara',        province: 'Eastern',        provinceKey: 'eastern',       color: '#eb3232' },
+  anuradhapura:  { name: 'Anuradhapura',  province: 'North Central',  provinceKey: 'north_central',  color: '#eb3232' },
+  badulla:       { name: 'Badulla',       province: 'Uva',            provinceKey: 'uva',            color: '#eb3232' },
+  batticaloa:    { name: 'Batticaloa',    province: 'Eastern',        provinceKey: 'eastern',        color: '#eb3232' },
+  colombo:       { name: 'Colombo',       province: 'Western',        provinceKey: 'western',        color: '#eb3232' },
+  galle:         { name: 'Galle',         province: 'Southern',       provinceKey: 'southern',       color: '#eb3232' },
+  gampaha:       { name: 'Gampaha',       province: 'Western',        provinceKey: 'western',        color: '#eb3232' },
+  hambantota:    { name: 'Hambantota',    province: 'Southern',       provinceKey: 'southern',       color: '#eb3232' },
+  jaffna:        { name: 'Jaffna',        province: 'Northern',       provinceKey: 'northern',       color: '#eb3232' },
+  kalutara:      { name: 'Kalutara',      province: 'Western',        provinceKey: 'western',        color: '#eb3232' },
+  kandy:         { name: 'Kandy',         province: 'Central',        provinceKey: 'central',        color: '#eb3232' },
+  kegalle:       { name: 'Kegalle',       province: 'Sabaragamuwa',   provinceKey: 'sabaragamuwa',   color: '#eb3232' },
+  kilinochchi:   { name: 'Kilinochchi',   province: 'Northern',       provinceKey: 'northern',       color: '#eb3232' },
+  kurunegala:    { name: 'Kurunegala',    province: 'North Western',  provinceKey: 'north_western',  color: '#eb3232' },
+  mannar:        { name: 'Mannar',        province: 'Northern',       provinceKey: 'northern',       color: '#eb3232' },
+  matale:        { name: 'Matale',        province: 'Central',        provinceKey: 'central',        color: '#eb3232' },
+  matara:        { name: 'Matara',        province: 'Southern',       provinceKey: 'southern',       color: '#eb3232' },
+  monaragala:    { name: 'Monaragala',    province: 'Uva',            provinceKey: 'uva',            color: '#eb3232' },
+  mullaitivu:    { name: 'Mullaitivu',    province: 'Northern',       provinceKey: 'northern',       color: '#eb3232' },
+  nuwara_eliya:  { name: 'Nuwara Eliya',  province: 'Central',        provinceKey: 'central',        color: '#eb3232' },
+  polonnaruwa:   { name: 'Polonnaruwa',   province: 'North Central',  provinceKey: 'north_central',  color: '#eb3232' },
+  puttalam:      { name: 'Puttalam',      province: 'North Western',  provinceKey: 'north_western',  color: '#eb3232' },
+  ratnapura:     { name: 'Ratnapura',     province: 'Sabaragamuwa',   provinceKey: 'sabaragamuwa',   color: '#eb3232' },
+  trincomalee:   { name: 'Trincomalee',   province: 'Eastern',        provinceKey: 'eastern',        color: '#eb3232' },
+  vavuniya:      { name: 'Vavuniya',      province: 'Northern',       provinceKey: 'northern',       color: '#eb3232' },
+}
 
 function getRegionKeyFromFeature(feature) {
-  // Try all known property names used across different GeoJSON sources for
-  // Sri Lanka provinces (ISO code, ADM1 name, generic "name", etc.)
+  // `district_key` is the field this app's own geojson was built with —
+  // check it first. The rest are fallbacks in case the file ever gets
+  // swapped for a different Sri Lanka boundaries source that doesn't carry
+  // that exact property.
   const raw =
-    feature.getProperty('shapeISO') ||
-    feature.getProperty('ISO') ||
-    feature.getProperty('iso_3166_2') ||
-    feature.getProperty('ADM1_EN') ||
-    feature.getProperty('NAME_1') ||
+    feature.getProperty('district_key') ||
     feature.getProperty('name') ||
-    feature.getProperty('province') ||
+    feature.getProperty('NAME_1') ||
+    feature.getProperty('hasc') ||
     feature.getId()
 
   if (!raw) return null
-  return codeToRegion[String(raw).toLowerCase()] || null
+  const normalized = String(raw).toLowerCase().trim().replace(/\s+/g, '_')
+  if (SRI_LANKA_DISTRICTS[normalized]) return normalized
+
+  // Handles a raw "Nuwara Eliya" (space instead of underscore, different
+  // case) or an HASC code like "LK.CO" falling through to here.
+  const byName = Object.entries(SRI_LANKA_DISTRICTS).find(
+    ([, d]) => d.name.toLowerCase() === String(raw).toLowerCase()
+  )
+  return byName ? byName[0] : null
 }
 
-function getStyleFn() {
+function getStyleFn(mapId) {
+  const state = getState(mapId)
   return (feature) => {
     const regionKey = getRegionKeyFromFeature(feature)
-    const region = regionKey ? SRI_LANKA_PROVINCES[regionKey] : null
+    const region = regionKey ? SRI_LANKA_DISTRICTS[regionKey] : null
 
-    if (activeRegionKey && regionKey === activeRegionKey) {
+    if (state.activeRegionKey && regionKey === state.activeRegionKey) {
       return {
         strokeColor: region.color,
         strokeOpacity: 1,
@@ -72,18 +97,40 @@ function getStyleFn() {
   }
 }
 
-export async function initRegionTool(onRegionSelected) {
-  onRegionSelectedCallback = onRegionSelected
-  const map = getMap()
+// mapId defaults to 'map' so existing callers (properties/page.tsx, which
+// calls initMap('map')) don't need to change. Pass the same id you gave
+// initMap() when attaching this to a different map (e.g.
+// initRegionTool(callback, 'all-properties-map')).
+export async function initRegionTool(onRegionSelected, mapId = 'map') {
+  const state = getState(mapId)
+  state.onRegionSelectedCallback = onRegionSelected
+
+  // Already attached to this map — don't re-fetch the geojson or attach a
+  // second copy of the click/mouseover/mouseout listeners. The callback
+  // above is still refreshed on every call, since a re-invocation (e.g. a
+  // component remounting with fresh closures) legitimately needs its new
+  // callback wired in even though the map layer itself doesn't need
+  // rebuilding.
+  if (initializedMapIds.has(mapId)) {
+    console.log(`[RegionTool] initRegionTool("${mapId}") already attached — refreshing callback only`)
+    return
+  }
+  // Claimed synchronously, before the fetch below — not after it succeeds.
+  // If two initRegionTool() calls for the same mapId land back-to-back
+  // (which is exactly the double-invoke scenario this guard exists for),
+  // marking it only on success would leave a window where both calls see
+  // initializedMapIds.has(mapId) === false and both proceed to attach
+  // listeners anyway.
+  initializedMapIds.add(mapId)
+
+  const map = getMap(mapId)
 
   try {
-    // NOTE: swap in a Sri Lanka province-boundaries GeoJSON URL here (e.g.
-    // an ADM1-level export from GADM or HDX). Kept as a placeholder so this
-    // never silently fetches Japan data - point it at your own hosted file
-    // or a raw.githubusercontent.com URL for a Sri Lanka provinces geojson.
-    const response = await fetch(
-      '/data/sri-lanka-provinces.geojson'
-    )
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+    const response = await fetch(`${basePath}/data/sri-lanka-provinces.geojson`)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch district boundaries: ${response.status} ${response.statusText}`)
+    }
     const geojson = await response.json()
 
     // Debug: log the first feature's properties so we can verify the key names
@@ -93,19 +140,19 @@ export async function initRegionTool(onRegionSelected) {
     }
 
     map.data.addGeoJson(geojson)
-    map.data.setStyle(getStyleFn())
+    map.data.setStyle(getStyleFn(mapId))
 
     map.data.addListener('click', (event) => {
       const regionKey = getRegionKeyFromFeature(event.feature)
       console.log('[RegionTool] Clicked feature regionKey:', regionKey)
       if (!regionKey) return
-      handleRegionClick(map, regionKey)
+      handleRegionClick(map, mapId, regionKey)
     })
 
     map.data.addListener('mouseover', (event) => {
       const regionKey = getRegionKeyFromFeature(event.feature)
-      if (regionKey && regionKey !== activeRegionKey) {
-        const region = SRI_LANKA_PROVINCES[regionKey]
+      if (regionKey && regionKey !== state.activeRegionKey) {
+        const region = SRI_LANKA_DISTRICTS[regionKey]
         event.feature.setProperty('_hover', true)
         map.data.overrideStyle(event.feature, {
           fillOpacity: 0.2,
@@ -121,37 +168,71 @@ export async function initRegionTool(onRegionSelected) {
     })
 
   } catch (err) {
-    console.error('[RegionTool] Failed to load GeoJSON:', err)
+    console.error(`[RegionTool] Failed to load GeoJSON (mapId="${mapId}"):`, err)
+    // Setup didn't actually succeed — release the claim so a later retry
+    // (e.g. the user reloads, or another effect run happens) isn't
+    // permanently blocked by a failed first attempt.
+    initializedMapIds.delete(mapId)
   }
 }
 
-function handleRegionClick(map, regionKey) {
-  if (activeRegionKey === regionKey) {
-    activeRegionKey = null
-    map.data.setStyle(getStyleFn())
-    if (onRegionSelectedCallback) onRegionSelectedCallback(null)
+function handleRegionClick(map, mapId, regionKey) {
+  const state = getState(mapId)
+
+  if (state.activeRegionKey === regionKey) {
+    state.activeRegionKey = null
+    map.data.setStyle(getStyleFn(mapId))
+    if (state.onRegionSelectedCallback) state.onRegionSelectedCallback(null)
     return
   }
 
-  activeRegionKey = regionKey
-  map.data.setStyle(getStyleFn())
+  state.activeRegionKey = regionKey
+  map.data.setStyle(getStyleFn(mapId))
 
-  const region = SRI_LANKA_PROVINCES[regionKey]
-  console.log(`[RegionTool] Region selected: ${region.name}`)
+  const region = SRI_LANKA_DISTRICTS[regionKey]
+  console.log(`[RegionTool] District selected: ${region.name} (${region.province} Province)`)
 
-  if (onRegionSelectedCallback) {
-    onRegionSelectedCallback({ key: regionKey, name: region.name })
+  if (state.onRegionSelectedCallback) {
+    // `key` is a district slug (e.g. "colombo") — matches property.district
+    // in properties/page.tsx's normalizeProperty(), so its existing
+    // initRegionTool() callback (which filters propertiesCache by
+    // property.district?.includes(region.key)) keeps working unchanged.
+    // province/provinceKey are extra context for display only.
+    state.onRegionSelectedCallback({
+      key: regionKey,
+      name: region.name,
+      province: region.province,
+      provinceKey: region.provinceKey,
+    })
   }
 }
 
-export function clearRegionSelection() {
-  const map = getMap()
-  activeRegionKey = null
-  map.data.setStyle(getStyleFn())
+export function clearRegionSelection(mapId = 'map') {
+  try {
+    const map = getMap(mapId)
+    const state = getState(mapId)
+    state.activeRegionKey = null
+    map.data.setStyle(getStyleFn(mapId))
+  } catch (err) {
+    // Map for this id may already be gone (e.g. called after destroyMap(),
+    // or for a map/page that never initialized this tool) — cleanup-style
+    // calls shouldn't throw and crash the caller over that.
+    console.warn(`[RegionTool] clearRegionSelection: no map "${mapId}" to clear:`, err.message)
+  }
 }
 
-export function removeRegionTool() {
-  const map = getMap()
-  map.data.forEach((feature) => map.data.remove(feature))
-  activeRegionKey = null
+export function removeRegionTool(mapId = 'map') {
+  try {
+    const map = getMap(mapId)
+    map.data.forEach((feature) => map.data.remove(feature))
+  } catch (err) {
+    console.warn(`[RegionTool] removeRegionTool: no map "${mapId}" to remove features from:`, err.message)
+  }
+  delete toolState[mapId]
+  // Release the "already attached" claim too — a genuine unmount+remount
+  // (navigating away from the page and back, not just a Strict
+  // Mode/Fast-Refresh double-invoke within the same mount) destroys the
+  // underlying map and should be allowed to set the region tool up fresh
+  // next time, not stay permanently skipped because of this guard.
+  initializedMapIds.delete(mapId)
 }
