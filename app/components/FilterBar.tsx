@@ -3,17 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
-// ─────────────────────────────────────────────────────────────────────────
-// FilterState
-// Field names are kept aligned with the Toddyland properties page filter
-// predicate (region, propertyType, priceMin/Max, buildingSizeMin/Max,
-// landSizeMin/Max, propertyFeature, ageOfBuilding, sizeUnit, tab) so this
-// component drops in without touching that page's filtering logic.
-// bedrooms/bathrooms/propertyHighlights/showOnlyAvailable/sortBy are new
-// fields introduced by the wireframe and not yet consumed there.
-// ─────────────────────────────────────────────────────────────────────────
 export interface FilterState {
-  tab: 'buy' | 'rent' | 'land'
+  tab: 'all' | 'buy' | 'rent' | 'land'
   region: string
   propertyType: string
   priceCurrency: 'LKR'
@@ -41,7 +32,7 @@ interface FilterBarProps {
 }
 
 export const defaultFilters: FilterState = {
-  tab: 'buy',
+  tab: 'all',
   region: 'any',
   propertyType: 'any',
   priceCurrency: 'LKR',
@@ -126,39 +117,40 @@ const landSizeOptions = [
   { value: '50000+', label: '50,000+ m² (5 ha+)' },
 ]
 
+// Slug vocabulary matches src/data/sampleProperties.js's `features` arrays
+// exactly (one flat feature list per listing — there's no separate
+// highlights field in that data), so both Property Features and Property
+// Highlights filter against the same set of values. Split here into two
+// lists purely for the two different UI sections in the wireframe:
+// "amenity"-flavored entries under Features, "location"-flavored entries
+// under Highlights.
 const propertyFeatureOptions = [
-  { value: 'internet_coverage', label: 'Internet Coverage' },
-  { value: 'fiber_optic', label: 'Fiber Optic / High-Speed Internet' },
-  { value: 'electricity', label: 'Electricity' },
-  { value: 'air_condition', label: 'Air Condition' },
   { value: 'parking', label: 'Parking' },
-  { value: 'hot_water', label: 'Hot Water' },
-  { value: 'refrigerator', label: 'Refrigerator' },
-  { value: 'fully_furnished', label: 'Fully Furnished' },
+  { value: 'air_conditioning', label: 'Air Conditioning' },
   { value: 'swimming_pool', label: 'Swimming Pool' },
+  { value: 'wifi_ready', label: 'Wifi Ready' },
   { value: 'garden', label: 'Garden' },
-  { value: 'clean_water_supply', label: 'Clean Water Supply' },
-  { value: 'balcony', label: 'Balcony' },
-  { value: 'kitchen', label: 'Kitchen' },
-  { value: 'sauna', label: 'Sauna' },
+  { value: 'renovation_possible', label: 'Renovation Possible' },
 ]
 
 const propertyHighlightOptions = [
+  { value: 'sea_view', label: 'Sea View' },
   { value: 'near_beach', label: 'Near Beach' },
-  { value: 'near_city_economic_zone', label: 'Near City and Economic Zone' },
-  { value: 'near_tourist_attraction', label: 'Near Tourist Attraction' },
-  { value: 'near_tea_plantation', label: 'Near Tea Plantation' },
-  { value: 'near_mountain', label: 'Near Mountain' },
-  { value: 'near_paddyfield', label: 'Near Paddyfield' },
-  { value: 'near_forests', label: 'Near Forests' },
-  { value: 'near_lake', label: 'Near Lake' },
-  { value: 'near_river_stream', label: 'Near River / Stream' },
-  { value: 'off_grid_recommended', label: 'Off-Grid Recommended' },
-  { value: 'digital_nomad_workstation', label: 'Digital Nomad Workstation' },
-  { value: 'recommended', label: 'Recommended' },
+  { value: 'near_city', label: 'Near City' },
+  { value: 'near_tourist', label: 'Near Tourist Attraction' },
+  { value: 'near_mountains', label: 'Near Mountains' },
+  { value: 'near_national_park', label: 'Near National Park' },
+  { value: 'countryside', label: 'Countryside' },
+  { value: 'digital_nomad', label: 'Digital Nomad Friendly' },
 ]
 
 const sortOptionsByTab: Record<FilterState['tab'], { value: string; label: string }[]> = {
+  all: [
+    { value: 'price_low', label: 'Price Lowest First' },
+    { value: 'price_high', label: 'Price Highest First' },
+    { value: 'age_new', label: 'Age - Newest First' },
+    { value: 'age_old', label: 'Age - Oldest First' },
+  ],
   buy: [
     { value: 'price_low', label: 'Price Lowest First' },
     { value: 'price_high', label: 'Price Highest First' },
@@ -718,7 +710,7 @@ export default function FilterBar({ filters, onChange, onSearch, onToggleMap }: 
         <div style={{ flexShrink: 0 }}>
           <div style={{ ...headerLabelStyle, visibility: 'hidden' }}>Tabs</div>
           <div style={{ display: 'inline-flex', background: '#f3f4f6', borderRadius: '8px', padding: '3px' }}>
-            {(['buy', 'rent', 'land'] as const).map((tab) => (
+            {(['all', 'buy', 'rent', 'land'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setTab(tab)}

@@ -1,5 +1,3 @@
-// Builds the HTML content element for a price-pill marker (AdvancedMarkerElement)
-
 function formatPriceLabel(property) {
   const currency = (typeof window !== 'undefined' && window.localStorage)
     ? localStorage.getItem('global_currency') || 'LKR'
