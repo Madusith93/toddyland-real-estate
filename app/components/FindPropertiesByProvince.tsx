@@ -206,7 +206,7 @@ export default function FindPropertiesByProvince() {
           <div className="lg:col-span-4 flex items-center justify-center p-2">
             <div className="relative w-full max-w-[340px] flex justify-center items-center">
               <img
-                src="/sri-lanka-map.png"
+                src="./sri-lanka-map.png"
                 alt="Sri Lanka Province Map"
                 className={`w-full h-auto object-contain transition-all duration-300 ${
                   activeProvince ? 'brightness-105 drop-shadow-xl' : 'drop-shadow-md'

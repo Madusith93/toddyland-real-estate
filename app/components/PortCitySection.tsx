@@ -24,7 +24,7 @@ export default function PortCitySection() {
           {/* Main Large Image Placeholder */}
           <div className="relative w-full h-[300px] sm:h-[420px] bg-slate-200 rounded-xl overflow-hidden shadow-sm">
             <Image
-              src="/port-city-main.webp" 
+              src="./port-city-main.webp" 
               alt="Port City Main Banner"
               fill
               className="object-cover"
@@ -36,7 +36,7 @@ export default function PortCitySection() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="relative w-full h-[220px] bg-slate-200 rounded-xl overflow-hidden shadow-sm">
               <Image
-                src="/port-city-1.webp"
+                src="./port-city-1.webp"
                 alt="Port City Sub 1"
                 fill
                 className="object-cover"
@@ -44,7 +44,7 @@ export default function PortCitySection() {
             </div>
             <div className="relative w-full h-[220px] bg-slate-200 rounded-xl overflow-hidden shadow-sm">
               <Image
-                src="/port-city-2.webp"
+                src="./port-city-2.webp"
                 alt="Port City Sub 2"
                 fill
                 className="object-cover"
@@ -52,7 +52,7 @@ export default function PortCitySection() {
             </div>
             <div className="relative w-full h-[220px] bg-slate-200 rounded-xl overflow-hidden shadow-sm">
               <Image
-                src="/port-city-3.webp"
+                src="./port-city-3.webp"
                 alt="Port City Sub 3"
                 fill
                 className="object-cover"

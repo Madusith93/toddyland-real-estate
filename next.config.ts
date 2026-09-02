@@ -1,15 +1,21 @@
-const basePath = '/toddyland'
+import type { NextConfig } from 'next'
 
-const nextConfig = {
-  basePath,
-  assetPrefix: basePath,
+const isProd = process.env.NODE_ENV === 'production';
+
+const nextConfig: NextConfig = {
+
+  basePath: isProd ? '/toddyland' : '',
+  
   trailingSlash: true,
   output: 'export',
-  env: {
-    NEXT_PUBLIC_BASE_PATH: basePath,
-  },
   images: {
-    unoptimized: true,   // required for static export — no server to optimize images on-demand
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
   },
 }
 

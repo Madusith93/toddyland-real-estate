@@ -113,7 +113,7 @@ export default function HeroSection() {
         <div className="lg:col-span-5">
           <div className="group relative h-72 sm:h-80 w-full rounded-3xl overflow-hidden shadow-xl border border-slate-100">
             <Image
-              src="/portcity.webp"
+              src="./portcity.webp"
               alt="Port City Colombo Sri Lanka"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"

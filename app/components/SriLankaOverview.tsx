@@ -14,25 +14,25 @@ const mapSectionItems: MapCardItem[] = [
     id: 'terrain-map',
     title: 'Terrain Map',
     description: 'Topography, elevation & geographic features of Sri Lanka',
-    image: '/maps/terrain.webp',
+    image: './maps/terrain.webp',
   },
   {
     id: 'economic-zones',
     title: 'Major Economic Zones',
     description: 'Commercial hubs, industrial zones & development sectors',
-    image: '/maps/economic-zones.webp',
+    image: './maps/economic-zones.webp',
   },
   {
     id: 'weather-may-sep',
     title: 'Weather Map (May - Sep)',
     description: 'Southwest Monsoon (Yala) rainfall & climate coverage',
-    image: '/maps/may sep.png',
+    image: './maps/may sep.png',
   },
   {
     id: 'weather-oct-apr',
     title: 'Weather Map (Oct - Apr)',
     description: 'Northeast Monsoon (Maha) climate & weather patterns',
-    image: '/maps/oct apr.jpeg',
+    image: './maps/oct apr.jpeg',
   },
 ];
 

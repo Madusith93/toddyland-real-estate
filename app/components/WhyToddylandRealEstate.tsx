@@ -95,7 +95,7 @@ export default function WhyChooseUsSection() {
         <div className="w-full flex justify-center mt-6">
           <div className="relative w-full max-w-2xl h-[550px] sm:h-[650px] rounded-2xl overflow-hidden border border-slate-200 shadow-lg bg-white group">
             <Image
-              src="/sri-lanka-map.png"
+              src="./sri-lanka-map.png"
               alt="Sri Lanka Coverage & Real Estate Map"
               fill
               className="object-contain p-6 group-hover:scale-105 transition-transform duration-500"

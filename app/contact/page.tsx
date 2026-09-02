@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function AboutContactPage() {
   const whatsappNumber = "94760180036";
-  const emailAddress = "info@toddylandrealestate.com"; // ඔයාගේ Email එක මෙතැනට දාන්න
+  const emailAddress = "info@toddylandrealestate.com"; 
 
   return (
     <main translate="yes" className="min-h-screen bg-slate-50 text-slate-900 py-12 px-4 sm:px-6 lg:px-8">

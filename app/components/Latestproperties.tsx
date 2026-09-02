@@ -14,7 +14,7 @@ const propertiesData = [
     price: '105,000,000 LKR ',
     location: 'Galle - Southern province',
     layout: '4B / 136m2',
-    image: '/apartment.jpg',
+    image: './apartment.jpg',
   },
   {
     id: 2,
@@ -23,7 +23,7 @@ const propertiesData = [
     price: '137,000,000 LKR ',
     location: 'Colombo - Western province',
     layout: '4LDK / 180m2',
-    image: '/villa.webp',
+    image: './villa.webp',
   },
   {
     id: 3,
@@ -32,7 +32,7 @@ const propertiesData = [
     price: '85,000,000 LKR ',
     location: 'Mount Lavinia - Western province',
     layout: '3B / 125m2',
-    image: '/lux.jpg',
+    image: './lux.jpg',
   },
 
   // RENT Category (3 Cards)
@@ -43,7 +43,7 @@ const propertiesData = [
     price: '750,000 LKR / ',
     location: 'Colombo 03 - Western province',
     layout: '3B / 120m2',
-    image: '/rent apa.jpg',
+    image: './rent apa.jpg',
   },
   {
     id: 5,
@@ -52,7 +52,7 @@ const propertiesData = [
     price: '1,200,000 LKR / ',
     location: 'Bentota - Southern province',
     layout: '4B / 200m2',
-    image: '/beach villa.jpeg',
+    image: './beach villa.jpeg',
   },
   {
     id: 6,
@@ -61,7 +61,7 @@ const propertiesData = [
     price: '950,000 LKR / ',
     location: 'Colombo 07 - Western province',
     layout: '3LDK / 160m2',
-    image: '/penthouse.jpg',
+    image: './penthouse.jpg',
   },
 
   // LAND Category (3 Cards)
@@ -72,7 +72,7 @@ const propertiesData = [
     price: '60,000,000 LKR',
     location: 'Mirissa - Southern province',
     layout: '20 Perches',
-    image: '/beachfrontland.jpg',
+    image: './beachfrontland.jpg',
   },
   {
     id: 8,
@@ -81,7 +81,7 @@ const propertiesData = [
     price: '120,000,000 LKR',
     location: 'Rajagiriya - Western province',
     layout: '15 Perches',
-    image: '/commericalland.jpg',
+    image: './commericalland.jpg',
   },
   {
     id: 9,
@@ -90,7 +90,7 @@ const propertiesData = [
     price: '35,000,000 LKR',
     location: 'Kandy - Central province',
     layout: '12.5 Perches',
-    image: '/Residential.jpg',
+    image: './Residential.jpg',
   },
 ];
 
