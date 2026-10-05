@@ -130,3 +130,49 @@ export async function getMe(token) {
     return null
   }
 }
+
+// Forgot password — always returns a generic success message regardless of
+// whether the email exists (the backend intentionally doesn't leak that).
+export async function forgotPassword(email) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+    const data = await res.json().catch(() => null)
+    if (!res.ok) {
+      console.error(`forgotPassword failed: ${res.status} ${res.statusText}`)
+      return { ...data, success: false, status: res.status }
+    }
+    return { ...data, success: true }
+  } catch (err) {
+    console.error('forgotPassword error:', err)
+    return { success: false, message: 'Network error. Please try again.' }
+  }
+}
+
+// Reset password
+export async function resetPassword(email, otp, password) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        otp,
+        password,
+        password_confirmation: password
+      })
+    })
+    const data = await res.json().catch(() => null)
+    if (!res.ok) {
+      console.error(`resetPassword failed: ${res.status} ${res.statusText}`)
+      return { ...data, success: false, status: res.status }
+    }
+    return { ...data, success: true }
+  } catch (err) {
+    console.error('resetPassword error:', err)
+    return { success: false, message: 'Network error. Please try again.' }
+  }
+}
