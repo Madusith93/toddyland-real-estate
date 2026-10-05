@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import TranslateOffsetFix from "@/components/TranslateOffsetFix";
 import RouteTranslateHandler from "@/components/RouteTranslateHandler"; 
 import Footer from "@/components/Footer"; 
+import { AuthProvider } from './context/AuthContext'
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./globals.css";
@@ -80,17 +81,19 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
-        <RouteTranslateHandler /> 
+        <AuthProvider>
+          <RouteTranslateHandler /> 
 
-        <Navbar />
+          <Navbar />
 
-        <main className="flex-grow pt-16">
-          {children}
-        </main>
+          <main className="flex-grow pt-16">
+            {children}
+          </main>
 
-        <Footer /> 
+          <Footer /> 
 
-        <TranslateOffsetFix />
+          <TranslateOffsetFix />
+        </AuthProvider>
       </body>
     </html>
   );
