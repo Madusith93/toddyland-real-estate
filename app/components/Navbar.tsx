@@ -2,12 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Globe, Menu, X, Trees, Ship } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChevronDown, Globe, Menu, X, Trees, Ship, User, LogOut } from 'lucide-react';
 import PreferencesModal from './PreferencesModal';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
+  const router = useRouter();
+  const { user, logout, loading } = useAuth();
+
   const [isPropOpen, setIsPropOpen] = useState(false);
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   
   // State for Preferences Modal & Preferences Display
@@ -30,6 +36,13 @@ export default function Navbar() {
       window.removeEventListener('preferencesChanged', updatePrefDisplay);
     };
   }, []);
+
+  const handleLogout = async () => {
+    setIsAccountOpen(false);
+    setMobileMenu(false);
+    await logout();
+    router.push('/');
+  };
 
   return (
     <>
@@ -158,6 +171,51 @@ export default function Navbar() {
               <Globe className="w-4 h-4 text-slate-500" />
               <span>{prefDisplay}</span>
             </button>
+
+            {/* Auth: Sign In / Account */}
+            {!loading && (
+              user ? (
+                <div
+                  className="relative"
+                  onMouseEnter={() => setIsAccountOpen(true)}
+                  onMouseLeave={() => setIsAccountOpen(false)}
+                >
+                  <button className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-slate-200 bg-slate-50 text-slate-800 text-xs font-bold hover:bg-slate-100 transition-colors">
+                    <User className="w-4 h-4 text-slate-500" />
+                    <span className="max-w-[100px] truncate">{user.name}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isAccountOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isAccountOpen && (
+                    <div className="absolute top-full right-0 w-48 bg-white border border-slate-200 rounded-xl shadow-xl p-2 space-y-1 animate-in fade-in duration-150">
+                      {user.role === 'seller' && (
+                        <Link
+                          href="/list-property"
+                          className="block px-4 py-2.5 rounded-lg text-xs font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-all"
+                        >
+                          My Listings
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full px-4 py-2.5 rounded-lg text-xs font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-all text-left"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-slate-200 bg-slate-50 text-slate-800 text-xs font-bold hover:bg-slate-100 transition-colors"
+                >
+                  <User className="w-4 h-4 text-slate-500" />
+                  <span>Sign In</span>
+                </Link>
+              )
+            )}
           </div>
 
           {/* Mobile Hamburger Toggle */}
@@ -178,6 +236,37 @@ export default function Navbar() {
             <Link href="/projects/port-city" className="block text-xs font-black text-slate-800 py-1 uppercase">PROJECTS</Link>
             <Link href="/contact" className="block text-xs font-black text-slate-800 py-1 uppercase">CONTACT US</Link>
             <Link href="/agents" className="block text-xs font-black text-slate-800 py-1 uppercase">AGENTS</Link>
+
+            {/* Auth links, mobile */}
+            {!loading && (
+              user ? (
+                <>
+                  <div className="text-xs font-black text-slate-500 py-1 uppercase">
+                    Signed in as {user.name}
+                  </div>
+                  {user.role === 'seller' && (
+                    <Link href="/list-property" className="block text-xs font-black text-slate-800 py-1 uppercase">
+                      MY LISTINGS
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="block text-xs font-black text-red-600 py-1 uppercase"
+                  >
+                    SIGN OUT
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="block text-xs font-black text-slate-800 py-1 uppercase" onClick={() => setMobileMenu(false)}>
+                    SIGN IN
+                  </Link>
+                  <Link href="/register" className="block text-xs font-black text-slate-800 py-1 uppercase" onClick={() => setMobileMenu(false)}>
+                    REGISTER
+                  </Link>
+                </>
+              )
+            )}
             
             <div className="pt-3 border-t border-slate-100 space-y-3">
               <button 
